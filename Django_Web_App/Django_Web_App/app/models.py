@@ -1,7 +1,6 @@
 """
 Definition of models.
 """
-
 from django.db import models
 
 class Task(models.Model):
@@ -9,8 +8,18 @@ class Task(models.Model):
     TaskName = models.CharField(max_length=250)
     DateCreated = models.DateField()
 
+    def __unicode__(self):
+        """ Returns a string representation of a task. """
+        return self.TaskName
+
 class ToDo(models.Model):
-    Task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task)
     ToDoName = models.CharField(max_length=150)
     isDone = models.BooleanField()
+
+    def __unicode__(self):
+        """ Return string representation of Todo """
+        return self.ToDoName
+
+
 

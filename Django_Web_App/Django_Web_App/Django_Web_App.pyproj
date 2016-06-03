@@ -29,6 +29,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\admin.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\forms.py" />
     <Compile Include="app\models.py" />
     <Compile Include="app\tests.py" />
@@ -56,6 +59,7 @@
   <ItemGroup>
     <Content Include="app\static\app\content\SocialLinks.css" />
     <Content Include="app\static\app\content\todo.css" />
+    <Content Include="app\templates\app\about.html" />
     <Content Include="app\templates\app\business.html" />
     <Content Include="app\templates\app\pro.html" />
     <Content Include="app\templates\app\webApp.html" />
@@ -83,7 +87,7 @@
     <Content Include="app\static\app\scripts\respond.js" />
     <Content Include="app\static\app\scripts\respond.min.js" />
     <Content Include="app\static\app\scripts\_references.js" />
-    <Content Include="app\templates\app\about.html" />
+    <Content Include="app\static\app\scripts\about.html" />
     <Content Include="app\templates\app\contact.html" />
     <Content Include="app\templates\app\index.html" />
     <Content Include="app\templates\app\layout.html" />

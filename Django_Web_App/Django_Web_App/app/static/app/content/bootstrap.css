@@ -5738,11 +5738,11 @@ body.modal-open,
   margin-left: 0;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 450px) {
   .modal-dialog {
     right: auto;
     left: 50%;
-    width: 600px;
+    width: 450px;
     padding-top: 30px;
     padding-bottom: 30px;
   }

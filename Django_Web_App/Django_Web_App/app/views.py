@@ -1,11 +1,20 @@
 """
 Definition of views.
 """
-
+from app.models import Task,ToDo
 from django.shortcuts import render
-from django.http import HttpRequest
+from django.http import HttpRequest,HttpResponseRedirect
 from django.template import RequestContext
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404,render
+from django.template import RequestContext
+from django.utils import timezone
+from django.views.generic import ListView, DetailView
+from os import path
+
+import json
 
 def home(request):
     """Renders the home page."""
@@ -45,6 +54,7 @@ def about(request):
         }
     )
 
+@login_required
 def webApp(request):
     """ Renders Single Page App. """
     assert isinstance(request,HttpRequest)
@@ -52,7 +62,7 @@ def webApp(request):
         request,
             'app/webApp.html',
             {
-                'title':'Task<>'
+                'title': 'inbox'
             }
         )
 
@@ -77,3 +87,25 @@ def business(request):
                 'title' : 'business'
             }
         )
+
+class TaskListView(ListView):
+        model = Task
+        def get_context_data(self, **kwargs):
+            context = super(TaskListView,self).get_context_data(**kwargs)
+            context['year'] = datetime.now().year
+            return context
+
+def post_new_task(request):
+    """ Handles adding of task """
+    task = Task()
+    task.DateCreated = timezone.now()
+    task.UserID = request.user.id
+    task.TaskName = ''
+    task.save()
+    return render(request,'app/webApp.html',
+            {
+                'title': 'inbox'
+            }
+        )
+
+
