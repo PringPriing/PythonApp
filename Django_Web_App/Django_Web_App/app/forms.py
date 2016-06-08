@@ -1,7 +1,6 @@
 """
 Definition of forms.
 """
-
 from django import forms
 from .models import *
 from django.contrib.auth.forms import AuthenticationForm
@@ -18,7 +17,10 @@ class BootstrapAuthenticationForm(AuthenticationForm):
                                    'class': 'form-control',
                                    'placeholder':'Password'}))
 
-class PostForm(forms.ModelForm):
+class TaskForm(forms.ModelForm):
+    TaskName = forms.CharField(max_length=100, help_text="Please fill up this field.")
+
     class Meta:
         model = Task
+
         fields = ('TaskName',)

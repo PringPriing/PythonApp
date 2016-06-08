@@ -13,7 +13,7 @@ import app.views
 from django.conf.urls import include
 from django.contrib import admin
 from app.views import TaskListView
-from app.models import Task
+from app.models import Task,ToDo
 admin.autodiscover()
 
 urlpatterns = [
@@ -23,8 +23,6 @@ urlpatterns = [
     url(r'^about', app.views.about, name='about'),
     url(r'^webApp',
                 TaskListView.as_view(
-                queryset = Task.objects.order_by('DateCreated')[:5],
-                context_object_name = 'task_list',
                 template_name = 'app/webApp.html',),
             name='webApp'
         ),
@@ -52,7 +50,12 @@ urlpatterns = [
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
     # Uncomment the next line to enable the admin:
+
      url(r'^admin/', include(admin.site.urls)),
+     url(r'^AddTask/', app.views.AddTask, name='add_task'),
+     url(r'^AddToDo/', app.views.AddToDo, name='add_todo'),
+     url(r'^markasDone/', app.views.markasDone, name='markasDone'),
+     url(r'^getTodoByTaskID/$', app.views.getTodoByTaskID, name='getTodoByTaskID'),
+    
 ]

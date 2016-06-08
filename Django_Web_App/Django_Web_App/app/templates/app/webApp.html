@@ -11,6 +11,7 @@
         //$("#sortable").disableSelection();
 
         countTodos();
+        var TaskID;
 
         // all done btn
         $("#checkAll").click(function () {
@@ -34,9 +35,12 @@
         $('.todolist').on('change', '#sortable li input[type="checkbox"]', function () {
             if ($(this).prop('checked')) {
                 var doneItem = $(this).parent().parent().find('label').text();
+                var todoID = $(this).attr('data-value');
                 $(this).parent().parent().parent().addClass('remove');
                 done(doneItem);
                 countTodos();
+                MarkTodoAsDone(todoID);
+                getTodoByID();
             }
         });
 
@@ -53,9 +57,16 @@
 
         //create task
         function createTodo(text) {
-            var markup = '<li class="ui-state-default"><div class="checkbox"><label><input type="checkbox" value="" />' + text + '</label></div></li>';
-            $('#sortable').append(markup);
-            $('.add-todo').val('');
+            if (TaskID != undefined) {
+                var markup = '<div class="checkbox"><label><input type="checkbox" value="" />' + text + '</label></div>';
+                $('#todoItems').append(markup);
+                $('.add-todo').val('');
+                SaveToDo(text);
+            }
+            else {
+                alert('Please select a task');
+            }
+            
         }
 
         //mark task as done
@@ -63,7 +74,8 @@
             var done = doneItem;
             var markup = '<li><strike>' + done + '<button class="btn btn-default btn-xs pull-right  remove-item"><span class="glyphicon glyphicon-remove"></span></button></strike></li>';
             $('#done-items').append(markup);
-            $('.remove').remove();
+            getTodoByID();
+   
         }
 
         //mark all tasks as done
@@ -83,11 +95,193 @@
             $('#sortable li').remove();
             countTodos();
         }
-
         //remove done task from list
         function removeItem(element) {
             $(element).parent().remove();
         }
+
+        $('#task_form').on('submit', function (event) {
+            event.preventDefault();
+            var name = $("#ListName").val();
+            SaveTask();
+        });
+
+        function MarkTodoAsDone(paramtodoID) {
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    }
+                }
+            });
+
+            $.ajax({
+                url: "/markasDone/", // the endpoint
+                type: "POST", // http method
+                data: { todoID: paramtodoID }, // data sent with the post request
+                // handle a successful response
+                success: function (json) {
+                },
+                // handle a non-successful response
+                error: function (xhr, errmsg, err) {
+                    alert(errmsg)
+                }
+            });
+        }
+
+        function SaveToDo(todo) {
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    }
+                }
+            });
+
+            $.ajax({
+                url: "/AddToDo/", // the endpoint
+                type: "POST", // http method
+                data: { todoName: todo,taskID:TaskID }, // data sent with the post request
+                // handle a successful response
+                success: function (json) {
+                },
+                // handle a non-successful response
+                error: function (xhr, errmsg, err) {
+                    alert(errmsg)
+                }
+            });
+        }
+
+        function SaveTask() {
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    }
+                }
+            });
+            $.ajax({
+                url: "/AddTask/", // the endpoint
+                type: "POST", // http method
+                data: { taskname: $('#ListName').val() }, // data sent with the post request
+                // handle a successful response
+                success: function (json) {
+                    location.reload();
+                    $('#squarespaceModal').modal('toggle');
+                },
+
+                // handle a non-successful response
+                error: function (xhr, errmsg, err) {
+                    alert(errmsg)
+                }
+            });
+        }
+
+        function getTodoByID() {
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    }
+                }
+            });
+
+            $.get('/getTodoByTaskID/', { taskID: TaskID }, function (data) {
+
+                        $('#todoItems').empty();
+                        $('#done-items').empty();
+                $.each(data, function (i, obj) {
+                                var name = obj.fields['ToDoName'];
+                                var id = obj.pk;
+                                var isDone = obj.fields['isDone'];
+                                if (isDone == false) {
+                                    var markup = '<div class="checkbox"><label><input data-value="' + id + '" type="checkbox" value="" />' + name + '</label></div>';
+                                    $('#todoItems').append(markup);
+                                }
+                                else {
+                                    var markupDone = '<li><strike>' + name + '<button class="btn btn-default btn-xs pull-right  remove-item"><span class="glyphicon glyphicon-remove"></span></button></strike></li>';
+                                    $('#done-items').append(markupDone);
+                                }
+                       
+                            });
+            });
+           
+        }
+
+        $('ul.nav a').click(function () {
+            TaskID = $(this).attr('id');
+            var id = $(this).attr('id');
+            var dataValue = $(this).attr('data-value');
+            if (id != undefined) {
+                $("label[for = unit]").text(dataValue);
+                getTodoByID();
+            }
+        });
+
     });
 </script>
 
@@ -123,9 +317,9 @@
 							                <i class="glyphicon glyphicon-inbox"></i>
 							                Inbox </a>
 						                </li>
-						                <li>
-                                            {% for task in task_list %}
-                                                <a><i class="glyphicon glyphicon-tasks"></i>{{ task.TaskName }} </a>
+						                <li id="tasklist">
+                                            {% for task in Tasks %}
+                                                <a href="#" id="{{task.id}}" data-value="{{ task.TaskName }}"><i id="{{task.id}}"  class="glyphicon glyphicon-tasks"></i>{{ task.TaskName }}</a>
                                             {% empty %}
                                                  <li>No List yet.</li>
                                             {% endfor %}
@@ -141,53 +335,37 @@
 	                                <div class="row">
                                         {# To goes here #}
 		                                <section class="content">
-                                            <h1>House Chores</h1>
+                                            <h1><label for="unit"></label></h1>
+                                           
 			                                    <div class="container">
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <div class="todolist not-done">
                                                                  <h1>Todos</h1>
-                                                                    <input type="text" class="form-control add-todo" placeholder="Add todo">
+                                                                    <input type="text" class="form-control add-todo" placeholder="Add todo" required data-toggle="floatLabel">
+                                                                    <br />
                                                                         <hr>
                                                                         <ul id="sortable" class="list-unstyled">
-                                                                            <li class="ui-state-default">
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input type="checkbox" value="" />Take out the trash</label>
-                                                                                </div>
-                                                                            </li>
-                                                                            <li class="ui-state-default">
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input type="checkbox" value="" />Buy bread</label>
-                                                                                </div>
-                                                                            </li>
-                                                                            <li class="ui-state-default">
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input type="checkbox" value="" />Teach penguins to fly</label>
-                                                                                </div>
-                                                                            </li>
-                                                                            
+                                                                                <li id="todoItems" class="ui-state-default">
+                                                                                 
+                                                                                </li>   
+                                                                                
                                                                         </ul>
                                                                     <div class="todo-footer">
-                                                                        <strong><span class="count-todos"></span></strong> Items Left
+                                                                        <!-- <strong><span class="count-todos"></span></strong> Items Left-->
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="todolist">
                                                                  <h1>Already Done</h1>
-                                                                    <ul id="done-items" class="list-unstyled">
-                                                                        <li><strike>Some item <button class="remove-item btn btn-default btn-xs pull-right"><span class="glyphicon glyphicon-remove"></span></button></strike></li>
-                    
-                                                                    </ul>
+                                                                       <ul id="done-items" class="list-unstyled">
+                                                                      </ul>      
                                                                 </div>
                                                             </div>
                                                         </div>
                                                 </div>
 		                                </section>
-		
 	                                    </div>
                                     </div>
                             </div>
@@ -202,25 +380,25 @@
 			<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
 			<h3 class="modal-title" id="lineModalLabel">Create New List</h3>
 		</div>
-        <form method="POST">
+        <form id="task_form" action="" method="POST">
             {% csrf_token %}
-		<div class="modal-body" >
+           <div class="modal-body" >
             <!-- content goes here -->
                 <div class="form-group ">
                     <label>List Name</label>
-                    <input class="form-control"  placeholder="Enter List Name"  required data-toggle="floatLabel">
+                    <input id="ListName" class="form-control"  placeholder="Enter List Name"  required data-toggle="floatLabel">
                       <br />
                       <div class="profile-usertitle-name">
-						                    {{ user.username }} <span class="badge">owner</span>
+						                    {{ user.username }} <span class="label label-success">Owner</span>
 					                    </div>
 					                    <div class="profile-usertitle-job">
 						                    {{ user.email }}
 					                    </div>
                 </div>
-		 </div>
+		    </div>
 	        <div class="modal-footer">
                 <br />
-					    <input type="submit" id="saveImage" class="btn btn-success btn-hover-green" data-action="save" role="button">
+					    <input type="submit" id="saveTask" class="btn btn-success btn-hover-green" data-action="save" role="button">
                 <br />
                 <br />
 		    </div>
