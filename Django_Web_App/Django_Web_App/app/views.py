@@ -109,7 +109,6 @@ def markasDone(request):
     
     try:
         todo = ToDo.objects.get(id = request.POST.get('todoID'))
-        #todo = get_object_or_404(ToDo,request.POST.get('todoID'))
     except (KeyError, ToDo.DoesNotExist):
         return render(request, 'app/webApp.html', {
             'title': 'Task',

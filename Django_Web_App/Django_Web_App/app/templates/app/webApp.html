@@ -9,6 +9,7 @@
     $(document).ready(function () {
         //$("#sortable").sortable();
         //$("#sortable").disableSelection();
+   
 
         countTodos();
         var TaskID;
@@ -40,7 +41,7 @@
                 done(doneItem);
                 countTodos();
                 MarkTodoAsDone(todoID);
-                getTodoByID();
+                
             }
         });
 
@@ -58,13 +59,15 @@
         //create task
         function createTodo(text) {
             if (TaskID != undefined) {
-                var markup = '<div class="checkbox"><label><input type="checkbox" value="" />' + text + '</label></div>';
-                $('#todoItems').append(markup);
+                //var markup = '<div class="checkbox"><label><input type="checkbox" value="" />' + text + '</label></div>';
+                //$('#todoItems').append(markup);
                 $('.add-todo').val('');
                 SaveToDo(text);
+                $('#errorMessage').hide();
             }
             else {
-                alert('Please select a task');
+                
+                $('#errorMessage').show();
             }
             
         }
@@ -74,7 +77,6 @@
             var done = doneItem;
             var markup = '<li><strike>' + done + '<button class="btn btn-default btn-xs pull-right  remove-item"><span class="glyphicon glyphicon-remove"></span></button></strike></li>';
             $('#done-items').append(markup);
-            getTodoByID();
    
         }
 
@@ -137,6 +139,7 @@
                 data: { todoID: paramtodoID }, // data sent with the post request
                 // handle a successful response
                 success: function (json) {
+                    getTodoByID();
                 },
                 // handle a non-successful response
                 error: function (xhr, errmsg, err) {
@@ -176,6 +179,7 @@
                 data: { todoName: todo,taskID:TaskID }, // data sent with the post request
                 // handle a successful response
                 success: function (json) {
+                    getTodoByID();
                 },
                 // handle a non-successful response
                 error: function (xhr, errmsg, err) {
@@ -276,6 +280,7 @@
             TaskID = $(this).attr('id');
             var id = $(this).attr('id');
             var dataValue = $(this).attr('data-value');
+            $('#errorMessage').hide();
             if (id != undefined) {
                 $("label[for = unit]").text(dataValue);
                 getTodoByID();
@@ -343,6 +348,9 @@
                                                                 <div class="todolist not-done">
                                                                  <h1>Todos</h1>
                                                                     <input type="text" class="form-control add-todo" placeholder="Add todo" required data-toggle="floatLabel">
+                                                                    <div class="alert alert-danger"  id="errorMessage" style="display: none;">
+                                                                      <strong>Error!</strong> Please select task.
+                                                                    </div>
                                                                     <br />
                                                                         <hr>
                                                                         <ul id="sortable" class="list-unstyled">
