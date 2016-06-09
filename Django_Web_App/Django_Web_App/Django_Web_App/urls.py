@@ -57,5 +57,6 @@ urlpatterns = [
      url(r'^AddToDo/', app.views.AddToDo, name='add_todo'),
      url(r'^markasDone/', app.views.markasDone, name='markasDone'),
      url(r'^getTodoByTaskID/$', app.views.getTodoByTaskID, name='getTodoByTaskID'),
+     url(r'^CreateUser/', app.views.CreateUser, name='CreateUser'),
     
 ]

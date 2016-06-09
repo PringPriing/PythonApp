@@ -16,6 +16,7 @@ from os import path
 from app.forms import TaskForm
 from django.http import Http404, HttpResponse
 from django.core import serializers
+from django.contrib.auth.models import User
 
 import json
 
@@ -171,3 +172,20 @@ def getTodoByTaskID(request):
         data = serializers.serialize('json',todo_list)
 
     return HttpResponse(data, content_type='application/json')
+
+def CreateUser(request):
+    """ Handles registration of user """
+    if request.method == 'POST':
+        user = User.objects.create_superuser(
+            username=  request.POST.get('username'),
+            email = request.POST.get('email'),
+            password= request.POST.get('password')
+            )
+
+    return render(
+        request,
+        'app/login.html',
+        {
+            'year':datetime.now().year
+        }
+    )

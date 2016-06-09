@@ -1,6 +1,70 @@
 {% extends "app/layout.html" %}
 
 {% block content %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+      
+        $('#signupform').on('submit', function (event) {
+            event.preventDefault();
+            CreateUser();  
+        });
+
+        function CreateUser() {
+
+            var username = $("#username").val();
+            var email = $("#useremail").val();
+            var password = $("#userpassword").val();
+
+ 
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    }
+                }
+            });
+
+            $.ajax({
+                url: "/CreateUser/", // the endpoint
+                type: "POST", // http method
+                data: {
+                    username: username,
+                    email: email,
+                    password: password
+                }, // data sent with the post request
+                // handle a successful response
+                success: function (data) {
+                    $('#signupbox').hide();
+                    $('#validationerror').hide();
+                    $('#loginbox').show()
+                    $('#successMessage').show();
+                },
+                // handle a non-successful response
+                error: function (xhr, errmsg, err) {
+                    alert(errmsg)
+                }
+            });
+        }
+        
+    });
+</script>
 <hr />
 <hr />
 <div class="container">    
@@ -50,9 +114,11 @@
                                 </div>
 
                              {% if form.errors %}
-                             <p class="validation-summary-errors">Please enter a correct user name and password.</p>
+                             <p id="validationerror" class="validation-summary-errors">Please enter a correct user name and password.</p>
                              {% endif %}
-
+                            <div class="alert alert-success"  id="successMessage" style="display: none;">
+                              <strong>Account created!</strong> Sign in using your credentials.
+                            </div>
 
                                 <div class="form-group">
                                     <div class="col-md-12 control">
@@ -79,7 +145,7 @@
                             <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="#" onclick="$('#signupbox').hide(); $('#loginbox').show()">Sign In</a></div>
                         </div>  
                         <div class="panel-body" >
-                            <form id="signupform" class="form-horizontal" role="form">
+                            <form id="signupform" action="" method="POST" class="form-horizontal" role="form">
                                 
                                 <div id="signupalert" style="display:none" class="alert alert-danger">
                                     <p>Error:</p>
@@ -89,33 +155,21 @@
                                 <div class="form-group">
                                     <label for="email" class="col-md-3 control-label">Email</label>
                                     <div class="col-md-9">
-                                        <input type="email" class="form-control" name="email" placeholder="Email Address" required data-toggle="floatLabel">
+                                        <input id="useremail" type="email" class="form-control" name="email" placeholder="Email Address" required data-toggle="floatLabel">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="firstname" class="col-md-3 control-label">User Name</label>
                                     <div class="col-md-9">
-                                        <input type="text" class="form-control" name="firstname" placeholder="User Name" required data-toggle="floatLabel">
+                                        <input id="username" type="text" class="form-control" name="firstname" placeholder="User Name" required data-toggle="floatLabel">
                                 </div>
 
                                 </div>
                                 <div class="form-group">
-                                    <label for="firstname" class="col-md-3 control-label">First Name</label>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" name="firstname" placeholder="First Name(Optional)">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="lastname" class="col-md-3 control-label">Last Name</label>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" name="lastname" placeholder="Last Name(Optional)">
-                                    </div>
-                                </div>
-                                <div class="form-group">
                                     <label for="password" class="col-md-3 control-label">Password</label>
                                     <div class="col-md-9">
-                                        <input type="password" class="form-control" name="passwd" placeholder="Password" required data-toggle="floatLabel">
+                                        <input id="userpassword" input pattern=".{5,60}" required title="5 characters minimum" type="password" class="form-control" name="passwd" placeholder="Password" required data-toggle="floatLabel">
                                     </div>
                                 </div>
                                 <div class="form-group">
